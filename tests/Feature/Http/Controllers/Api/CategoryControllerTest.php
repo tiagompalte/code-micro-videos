@@ -4,7 +4,6 @@ namespace Tests\Feature\Http\Controllers\Api;
 
 use App\Models\Category;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
-use Illuminate\Foundation\Testing\TestResponse;
 use Tests\TestCase;
 use Tests\Traits\TestSaves;
 use Tests\Traits\TestValidations;
@@ -56,22 +55,6 @@ class CategoryControllerTest extends TestCase
         ];
         $this->assertInvalidationInStoreAction($data, 'boolean');
         $this->assertInvalidationInUpdateAction($data, 'boolean');
-    }
-
-    protected function assertInvalidationRequired(TestResponse $response)
-    {
-        $this->assertInvalidationFields($response, ['name'], 'required');
-        $response->assertJsonMissingValidationErrors(['is_active']);
-    }
-
-    protected function assertInvalidationMax(TestResponse $response)
-    {
-        $this->assertInvalidationFields($response, ['name'], 'max.string', ['max' => 255]);
-    }
-
-    protected function assertInvalidationBoolean(TestResponse $response)
-    {
-        $this->assertInvalidationFields($response, ['is_active'], 'boolean');
     }
 
     public function testStore()
