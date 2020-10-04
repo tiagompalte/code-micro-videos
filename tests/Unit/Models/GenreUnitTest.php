@@ -7,7 +7,7 @@ use App\Models\Traits\Uuid;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Tests\TestCase;
 
-class GenreTest extends TestCase
+class GenreUnitTest extends TestCase
 {
     private $genre;
 
@@ -40,7 +40,7 @@ class GenreTest extends TestCase
 
     public function testCastsAttribute()
     {
-        $casts = ['is_active' => 'boolean'];
+        $casts = ['id' => 'string', 'is_active' => 'boolean'];
         $this->assertEquals($casts, $this->genre->getCasts());
     }
 

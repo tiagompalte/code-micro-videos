@@ -11,7 +11,7 @@ use Tests\TestCase;
 # Método específico em um arquivo - vendor/bin/phpunit --filter testIfUseTraits tests/Unit/CategoryTest.php
 # Método específico em uma classe - vendor/bin/phpunit --filter CategoryTest::testIfUseTraits
 
-class CategoryTest extends TestCase
+class CategoryUnitTest extends TestCase
 {
     private $category;
 
@@ -44,7 +44,7 @@ class CategoryTest extends TestCase
 
     public function testCastsAttribute()
     {
-        $casts = ['is_active' => 'boolean'];
+        $casts = ['id' => 'string', 'is_active' => 'boolean'];
         $this->assertEquals($casts, $this->category->getCasts());
     }
 
