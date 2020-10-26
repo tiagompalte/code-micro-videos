@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class CreateVideosTable extends Migration
 {
@@ -22,6 +22,7 @@ class CreateVideosTable extends Migration
             $table->string('rating', 3);
             $table->smallInteger('duration');
             $table->string('video_file')->nullable();
+            $table->string('thumb_file')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });
