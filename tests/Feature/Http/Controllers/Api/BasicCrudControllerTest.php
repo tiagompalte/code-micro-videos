@@ -31,8 +31,11 @@ class BasicCrudControllerTest extends TestCase
     {
         /** @var CategoryStub $category */
         $category = CategoryStub::create(['name' => 'test_name', 'description' => 'test_description']);
-        $result = $this->controller->index()->toArray();
-        $this->assertEquals([$category->toArray()], $result);
+        $result = $this->controller->index();
+        $serialized = $result->response()->getData(true);
+        $this->assertEquals([$category->toArray()], $serialized['data']);
+        $this->assertArrayHasKey('meta', $serialized);
+        $this->assertArrayHasKey('links', $serialized);
     }
 
     public function testInvalidationDataInStore()
@@ -54,11 +57,9 @@ class BasicCrudControllerTest extends TestCase
             ->once()
             ->andReturn(['name' => 'test_name', 'description' => 'test_description']);
 
-        $obj = $this->controller->store($request);
-        $this->assertEquals(
-            CategoryStub::find(1)->toArray(),
-            $obj->toArray()
-        );
+        $result = $this->controller->store($request);
+        $serialized = $result->response()->getData(true);
+        $this->assertEquals(CategoryStub::first()->toArray(), $serialized['data']);
     }
 
     public function testIfFindOrFailFetchModel()
@@ -87,9 +88,11 @@ class BasicCrudControllerTest extends TestCase
 
     public function testShow()
     {
+        /** @var CategoryStub $category **/
         $category = CategoryStub::create(['name' => 'test_name', 'description' => 'test_description']);
         $result = $this->controller->show($category->id);
-        $this->assertEquals($result->toArray(), CategoryStub::find(1)->toArray());
+        $serialized = $result->response()->getData(true);
+        $this->assertEquals($category->toArray(), $serialized['data']);
     }
 
     public function testUpdate()
@@ -101,7 +104,9 @@ class BasicCrudControllerTest extends TestCase
             ->once()
             ->andReturn(['name' => 'test_changed', 'description' => 'test_description_changed']);
         $result = $this->controller->update($request, $category->id);
-        $this->assertEquals($result->toArray(), CategoryStub::find(1)->toArray());
+        $serialized = $result->response()->getData(true);
+        $category->refresh();
+        $this->assertEquals($category->toArray(), $serialized['data']);
     }
 
     public function testDestroy()
