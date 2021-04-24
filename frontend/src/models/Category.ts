@@ -1,5 +1,6 @@
-export interface Category {
+import {BaseModel} from "./BaseModel";
+
+export interface Category extends BaseModel {
     name: string
     description: string
-    isActive: boolean
 }

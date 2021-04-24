@@ -1,8 +1,8 @@
 import * as React from 'react';
 import {useEffect, useState} from 'react';
 import MUIDataTable, {MUIDataTableColumn} from "mui-datatables";
-import {httpVideo} from "../../util/http";
 import format from 'date-fns/format';
+import castMemberHttp from "../../util/http/cast-member-http";
 
 const CastMemberTypeMap = {
     1: 'Diretor',
@@ -41,7 +41,7 @@ const Table = (props: Props) => {
     const [data, setData] = useState([])
 
     useEffect(() => {
-        httpVideo.get('cast_members').then(response => setData(response.data.data))
+        castMemberHttp.list().then(({data})=> setData(data.data))
     }, [])
     return (
         <MUIDataTable

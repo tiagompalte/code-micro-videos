@@ -1,8 +1,8 @@
 import * as React from 'react';
 import {useEffect, useState} from 'react';
 import MUIDataTable, {MUIDataTableColumn} from "mui-datatables";
-import {httpVideo} from "../../util/http";
 import format from 'date-fns/format';
+import genreHttp from "../../util/http/genre-http";
 
 const columnsDefinition: MUIDataTableColumn[] = [
     {
@@ -36,7 +36,7 @@ const Table = (props: Props) => {
     const [data, setData] = useState([])
 
     useEffect(() => {
-        httpVideo.get('genres').then(response => setData(response.data.data))
+        genreHttp.list().then(({data}) => setData(data.data))
     }, [])
     return (
         <MUIDataTable
