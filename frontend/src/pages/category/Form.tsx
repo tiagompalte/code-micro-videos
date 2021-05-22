@@ -5,6 +5,9 @@ import categoryHttp from "../../util/http/category-http";
 import {yupResolver} from '@hookform/resolvers/yup';
 import * as yup from '../../util/vendor/yup';
 import {Category} from "../../models/Category";
+import {useEffect, useState} from "react";
+import {useParams} from "react-router";
+import {ParamId} from "../../util/http/param-id";
 
 const useStyles = makeStyles((theme: Theme) => {
     return {
@@ -28,17 +31,35 @@ export const Form = () => {
         variant: "contained"
     }
 
-    const {register, handleSubmit, getValues, errors} = useForm<Category>({
+    const {register, handleSubmit, getValues, errors, reset} = useForm<Category>({
         resolver: yupResolver(validationSchema),
         defaultValues: {
             is_active: true
         }
     })
 
-    function onSubmit(formData, event) {
+    const {id} = useParams<ParamId>();
+    const [category, setCategory] = useState<{id: string} | null>(null)
+
+    useEffect(() => {
+        if (!id) {
+            return
+        }
+
         categoryHttp
-            .create(formData)
-            .then((response) => console.log(response))
+            .get(id)
+            .then(({data}) => {
+                setCategory(data.data)
+                reset(data.data)
+            })
+    }, [])
+
+    function onSubmit(formData, event) {
+        const http = !category
+            ? categoryHttp.create(formData)
+            : categoryHttp.update(category.id, formData)
+
+        http.then((response) => console.log(response))
     }
 
     return (
@@ -51,6 +72,7 @@ export const Form = () => {
                 inputRef={register}
                 error={errors.name !== undefined}
                 helperText={errors.name && errors.name.message}
+                InputLabelProps={{shrink: true}}
             />
 
             <TextField
@@ -62,6 +84,7 @@ export const Form = () => {
                 variant="outlined"
                 margin="normal"
                 inputRef={register}
+                InputLabelProps={{shrink: true}}
             />
 
             <Checkbox
