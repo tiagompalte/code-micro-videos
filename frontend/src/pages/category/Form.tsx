@@ -25,12 +25,6 @@ export const Form = () => {
 
     const classes = useStyles();
 
-    const buttonProps: ButtonProps = {
-        className: classes.submit,
-        color: "secondary",
-        variant: "contained"
-    }
-
     const {
         register,
         handleSubmit,
@@ -48,6 +42,14 @@ export const Form = () => {
 
     const {id} = useParams<ParamId>();
     const [category, setCategory] = useState<{id: string} | null>(null)
+    const [loading, setLoading] = useState<boolean>(false)
+
+    const buttonProps: ButtonProps = {
+        className: classes.submit,
+        color: "secondary",
+        variant: "contained",
+        disabled: loading
+    }
 
     useEffect(() => {
         register({name: "is_active"})
@@ -58,12 +60,16 @@ export const Form = () => {
             return
         }
 
+        setLoading(true)
+
         categoryHttp
             .get(id)
             .then(({data}) => {
                 setCategory(data.data)
                 reset(data.data)
             })
+            .finally(() => setLoading(false))
+
     }, [])
 
     function onSubmit(formData, event) {
@@ -71,7 +77,11 @@ export const Form = () => {
             ? categoryHttp.create(formData)
             : categoryHttp.update(category.id, formData)
 
-        http.then((response) => console.log(response))
+        setLoading(true)
+
+        http
+            .then((response) => console.log(response))
+            .finally(() => setLoading(false))
     }
 
     return (
@@ -85,6 +95,7 @@ export const Form = () => {
                 error={errors.name !== undefined}
                 helperText={errors.name && errors.name.message}
                 InputLabelProps={{shrink: true}}
+                disabled={loading}
             />
 
             <TextField
@@ -97,9 +108,11 @@ export const Form = () => {
                 margin="normal"
                 inputRef={register}
                 InputLabelProps={{shrink: true}}
+                disabled={loading}
             />
 
             <FormControlLabel
+                disabled={loading}
                 control={
                     <Checkbox
                         name="is_active"
