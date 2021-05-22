@@ -8,6 +8,7 @@ import {Category} from "../../models/Category";
 import {useEffect, useState} from "react";
 import {useHistory, useParams} from "react-router";
 import {ParamId} from "../../util/http/param-id";
+import {useSnackbar} from "notistack";
 
 const useStyles = makeStyles((theme: Theme) => {
     return {
@@ -40,6 +41,7 @@ export const Form = () => {
         }
     })
 
+    const snackbar = useSnackbar()
     const history = useHistory()
     const {id} = useParams<ParamId>()
     const [category, setCategory] = useState<{id: string} | null>(null)
@@ -69,6 +71,7 @@ export const Form = () => {
                 setCategory(data.data)
                 reset(data.data)
             })
+            .catch((error) => snackbar.enqueueSnackbar('Não foi possível carregar a categoria', {variant: "error"}))
             .finally(() => setLoading(false))
 
     }, [])
@@ -82,6 +85,7 @@ export const Form = () => {
 
         http
             .then(({data}) => {
+                snackbar.enqueueSnackbar('Categoria salva com sucesso', {variant: "success"})
                 setTimeout(() => {
                     event
                         ? (
@@ -92,6 +96,7 @@ export const Form = () => {
                         : history.push('/categories')
                 })
             })
+            .catch((error) => snackbar.enqueueSnackbar('Não foi possível salvar a categoria', {variant: "error"}))
             .finally(() => setLoading(false))
     }
 
