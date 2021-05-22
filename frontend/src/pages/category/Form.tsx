@@ -1,4 +1,4 @@
-import {Box, Button, ButtonProps, Checkbox, TextField} from "@material-ui/core";
+import {Box, Button, ButtonProps, Checkbox, FormControlLabel, TextField} from "@material-ui/core";
 import {makeStyles, Theme} from "@material-ui/core/styles";
 import {useForm} from "react-hook-form";
 import categoryHttp from "../../util/http/category-http";
@@ -31,7 +31,15 @@ export const Form = () => {
         variant: "contained"
     }
 
-    const {register, handleSubmit, getValues, errors, reset} = useForm<Category>({
+    const {
+        register,
+        handleSubmit,
+        getValues,
+        setValue,
+        errors,
+        reset,
+        watch
+    } = useForm<Category>({
         resolver: yupResolver(validationSchema),
         defaultValues: {
             is_active: true
@@ -40,6 +48,10 @@ export const Form = () => {
 
     const {id} = useParams<ParamId>();
     const [category, setCategory] = useState<{id: string} | null>(null)
+
+    useEffect(() => {
+        register({name: "is_active"})
+    }, [register])
 
     useEffect(() => {
         if (!id) {
@@ -87,12 +99,18 @@ export const Form = () => {
                 InputLabelProps={{shrink: true}}
             />
 
-            <Checkbox
-                name="is_active"
-                defaultChecked
-                inputRef={register}
+            <FormControlLabel
+                control={
+                    <Checkbox
+                        name="is_active"
+                        color={"primary"}
+                        onChange={() => setValue('is_active', !getValues()['is_active'])}
+                        checked={watch('is_active')}
+                    />
+                }
+                label={'Ativo?'}
+                labelPlacement={'end'}
             />
-            Ativo?
 
             <Box dir="rtl">
                 <Button {...buttonProps} onClick={() => onSubmit(getValues(), null)}>Salvar</Button>
