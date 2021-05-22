@@ -6,7 +6,7 @@ import {yupResolver} from '@hookform/resolvers/yup';
 import * as yup from '../../util/vendor/yup';
 import {Category} from "../../models/Category";
 import {useEffect, useState} from "react";
-import {useParams} from "react-router";
+import {useHistory, useParams} from "react-router";
 import {ParamId} from "../../util/http/param-id";
 
 const useStyles = makeStyles((theme: Theme) => {
@@ -40,7 +40,8 @@ export const Form = () => {
         }
     })
 
-    const {id} = useParams<ParamId>();
+    const history = useHistory()
+    const {id} = useParams<ParamId>()
     const [category, setCategory] = useState<{id: string} | null>(null)
     const [loading, setLoading] = useState<boolean>(false)
 
@@ -80,7 +81,17 @@ export const Form = () => {
         setLoading(true)
 
         http
-            .then((response) => console.log(response))
+            .then(({data}) => {
+                setTimeout(() => {
+                    event
+                        ? (
+                            id
+                                ? history.replace(`/categories/${data.data.id}/edit`)
+                                : history.push(`/categories/${data.data.id}/edit`)
+                        )
+                        : history.push('/categories')
+                })
+            })
             .finally(() => setLoading(false))
     }
 
