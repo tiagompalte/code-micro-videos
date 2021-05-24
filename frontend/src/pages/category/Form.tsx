@@ -23,9 +23,6 @@ const validationSchema = yup.object().shape({
 });
 
 export const Form = () => {
-
-    const classes = useStyles();
-
     const {
         register,
         handleSubmit,
@@ -41,10 +38,11 @@ export const Form = () => {
         }
     })
 
+    const classes = useStyles()
     const snackbar = useSnackbar()
     const history = useHistory()
     const {id} = useParams<ParamId>()
-    const [category, setCategory] = useState<{id: string} | null>(null)
+    const [category, setCategory] = useState<Category | null>(null)
     const [loading, setLoading] = useState<boolean>(false)
 
     const buttonProps: ButtonProps = {
@@ -63,41 +61,46 @@ export const Form = () => {
             return
         }
 
-        setLoading(true)
-
-        categoryHttp
-            .get(id)
-            .then(({data}) => {
+        const getCategory = async () => {
+            setLoading(true)
+            try {
+                const {data} = await categoryHttp.get(id)
                 setCategory(data.data)
                 reset(data.data)
-            })
-            .catch((error) => snackbar.enqueueSnackbar('Não foi possível carregar a categoria', {variant: "error"}))
-            .finally(() => setLoading(false))
+            } catch (e) {
+                snackbar.enqueueSnackbar('Não foi possível carregar as informações', {variant: "error"})
+            } finally {
+                setLoading(false)
+            }
+        }
 
+        getCategory()
     }, [])
 
-    function onSubmit(formData, event) {
+    async function onSubmit(formData, event) {
+        setLoading(true)
+
         const http = !category
             ? categoryHttp.create(formData)
             : categoryHttp.update(category.id, formData)
 
-        setLoading(true)
-
-        http
-            .then(({data}) => {
-                snackbar.enqueueSnackbar('Categoria salva com sucesso', {variant: "success"})
-                setTimeout(() => {
-                    event
-                        ? (
-                            id
-                                ? history.replace(`/categories/${data.data.id}/edit`)
-                                : history.push(`/categories/${data.data.id}/edit`)
-                        )
-                        : history.push('/categories')
-                })
+        try {
+            const {data} = await http
+            snackbar.enqueueSnackbar('Categoria salva com sucesso', {variant: "success"})
+            setTimeout(() => {
+                event
+                    ? (
+                        id
+                            ? history.replace(`/categories/${data.data.id}/edit`)
+                            : history.push(`/categories/${data.data.id}/edit`)
+                    )
+                    : history.push('/categories')
             })
-            .catch((error) => snackbar.enqueueSnackbar('Não foi possível salvar a categoria', {variant: "error"}))
-            .finally(() => setLoading(false))
+        } catch (e) {
+            snackbar.enqueueSnackbar('Não foi possível salvar a categoria', {variant: "error"})
+        } finally {
+            setLoading(false)
+        }
     }
 
     return (
