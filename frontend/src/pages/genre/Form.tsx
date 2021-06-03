@@ -1,5 +1,4 @@
-import {Box, Button, ButtonProps, MenuItem, TextField} from "@material-ui/core";
-import {makeStyles, Theme} from "@material-ui/core/styles";
+import {MenuItem, TextField} from "@material-ui/core";
 import {useForm} from "react-hook-form";
 import genreHttp from "../../util/http/genre-http";
 import {useEffect, useState} from "react";
@@ -10,14 +9,7 @@ import {useSnackbar} from "notistack";
 import {useHistory, useParams} from "react-router";
 import {ParamId} from "../../util/http/param-id";
 import {Genre} from "../../models/Genre";
-
-const useStyles = makeStyles((theme: Theme) => {
-    return {
-        submit: {
-            margin: theme.spacing(1)
-        }
-    }
-})
+import SubmitActions from "../../components/SubmitActions";
 
 const validationSchema = yup.object().shape({
     name: yup.string().label('Nome').required().max(255),
@@ -26,27 +18,28 @@ const validationSchema = yup.object().shape({
 
 export const Form = () => {
 
-    const {register, handleSubmit, getValues, setValue, reset, errors, watch} = useForm<{ name: any, categories_id: any }>({
+    const {
+        register,
+        handleSubmit,
+        getValues,
+        setValue,
+        reset,
+        errors,
+        watch,
+        trigger
+    } = useForm<{ name: any, categories_id: any }>({
         resolver: yupResolver(validationSchema),
         defaultValues: {
             categories_id: []
         }
     })
 
-    const classes = useStyles()
     const snackbar = useSnackbar()
     const history = useHistory()
     const {id} = useParams<ParamId>()
     const [genre, setGenre] = useState<Genre | null>(null)
     const [categories, setCategories] = useState<any[]>([])
     const [loading, setLoading] = useState<boolean>(false)
-
-    const buttonProps: ButtonProps = {
-        className: classes.submit,
-        color: "secondary",
-        variant: "contained",
-        disabled: loading
-    }
 
     useEffect(() => {
         let isSubscribed = true;
@@ -154,10 +147,11 @@ export const Form = () => {
                 }
             </TextField>
 
-            <Box dir="rtl">
-                <Button {...buttonProps} onClick={() => onSubmit(getValues(), null)}>Salvar</Button>
-                <Button {...buttonProps} type="submit">Salvar e continuar editando</Button>
-            </Box>
+            <SubmitActions disabledButtons={loading}
+                           handleSave={() => trigger().then(isValid => {
+                               isValid && onSubmit(getValues(), null)
+                           })}
+            />
         </form>
     )
 }

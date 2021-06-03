@@ -1,5 +1,4 @@
-import {Box, Button, ButtonProps, Checkbox, FormControlLabel, TextField} from "@material-ui/core";
-import {makeStyles, Theme} from "@material-ui/core/styles";
+import {Checkbox, FormControlLabel, TextField} from "@material-ui/core";
 import {useForm} from "react-hook-form";
 import categoryHttp from "../../util/http/category-http";
 import {yupResolver} from '@hookform/resolvers/yup';
@@ -9,14 +8,7 @@ import {useEffect, useState} from "react";
 import {useHistory, useParams} from "react-router";
 import {ParamId} from "../../util/http/param-id";
 import {useSnackbar} from "notistack";
-
-const useStyles = makeStyles((theme: Theme) => {
-    return {
-        submit: {
-            margin: theme.spacing(1)
-        }
-    }
-})
+import SubmitActions from "../../components/SubmitActions";
 
 const validationSchema = yup.object().shape({
     name: yup.string().label('Nome').required().max(255)
@@ -30,7 +22,8 @@ export const Form = () => {
         setValue,
         errors,
         reset,
-        watch
+        watch,
+        trigger
     } = useForm<Category>({
         resolver: yupResolver(validationSchema),
         defaultValues: {
@@ -38,19 +31,11 @@ export const Form = () => {
         }
     })
 
-    const classes = useStyles()
     const snackbar = useSnackbar()
     const history = useHistory()
     const {id} = useParams<ParamId>()
     const [category, setCategory] = useState<Category | null>(null)
     const [loading, setLoading] = useState<boolean>(false)
-
-    const buttonProps: ButtonProps = {
-        className: classes.submit,
-        color: "secondary",
-        variant: "contained",
-        disabled: loading
-    }
 
     useEffect(() => {
         register({name: "is_active"})
@@ -150,10 +135,11 @@ export const Form = () => {
                 labelPlacement={'end'}
             />
 
-            <Box dir="rtl">
-                <Button {...buttonProps} onClick={() => onSubmit(getValues(), null)}>Salvar</Button>
-                <Button {...buttonProps} type="submit">Salvar e continuar editando</Button>
-            </Box>
+            <SubmitActions disabledButtons={loading}
+                           handleSave={() => trigger().then(isValid => {
+                               isValid && onSubmit(getValues(), null)
+                           })}
+            />
         </form>
     )
 }
