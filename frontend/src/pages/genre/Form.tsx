@@ -10,6 +10,7 @@ import {useHistory, useParams} from "react-router";
 import {ParamId} from "../../util/http/param-id";
 import {Genre} from "../../models/Genre";
 import SubmitActions from "../../components/SubmitActions";
+import {DefaultForm} from "../../components/DefaultForm";
 
 const validationSchema = yup.object().shape({
     name: yup.string().label('Nome').required().max(255),
@@ -105,7 +106,7 @@ export const Form = () => {
     }
 
     return (
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <DefaultForm onSubmit={handleSubmit(onSubmit)} GridItemProps={{xs: 12, md: 6}}>
             <TextField
                 name="name"
                 label="Nome"
@@ -152,6 +153,6 @@ export const Form = () => {
                                isValid && onSubmit(getValues(), null)
                            })}
             />
-        </form>
+        </DefaultForm>
     )
 }
