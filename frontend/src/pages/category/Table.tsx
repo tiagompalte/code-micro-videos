@@ -5,6 +5,7 @@ import format from 'date-fns/format';
 import categoryHttp from "../../util/http/category-http";
 import {Category} from "../../models/Category";
 import {BadgeNo, BadgeYes} from "../../components/Badge";
+import {ListResponse} from "../../util/ListResponse";
 
 const columnsDefinition: MUIDataTableColumn[] = [
     {
@@ -31,14 +32,22 @@ const columnsDefinition: MUIDataTableColumn[] = [
     }
 ]
 
-type Props = {
-
-};
-const Table = (props: Props) => {
+const Table = () => {
     const [data, setData] = useState<Category[]>([])
 
     useEffect(() => {
-        categoryHttp.list<{ data: Category[] }>().then(({data}) => setData(data.data))
+        let isSubscribed = true;
+
+        (async () => {
+            const {data} = await categoryHttp.list<ListResponse<Category>>()
+            if (isSubscribed) {
+                setData(data.data)
+            }
+        })()
+
+        return () => {
+            isSubscribed = false
+        }
     }, [])
     return (
         <MUIDataTable

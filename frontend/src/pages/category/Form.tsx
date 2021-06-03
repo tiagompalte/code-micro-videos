@@ -60,21 +60,27 @@ export const Form = () => {
         if (!id) {
             return
         }
+        let isSubscribed = true;
 
-        const getCategory = async () => {
+        // iife
+        (async () => {
             setLoading(true)
             try {
                 const {data} = await categoryHttp.get(id)
-                setCategory(data.data)
-                reset(data.data)
+                if (isSubscribed) {
+                    setCategory(data.data)
+                    reset(data.data)
+                }
             } catch (e) {
                 snackbar.enqueueSnackbar('Não foi possível carregar as informações', {variant: "error"})
             } finally {
                 setLoading(false)
             }
-        }
+        })()
 
-        getCategory()
+        return () => {
+            isSubscribed = false
+        }
     }, [])
 
     async function onSubmit(formData, event) {

@@ -3,6 +3,8 @@ import {useEffect, useState} from 'react';
 import MUIDataTable, {MUIDataTableColumn} from "mui-datatables";
 import format from 'date-fns/format';
 import genreHttp from "../../util/http/genre-http";
+import {Genre} from "../../models/Genre";
+import {ListResponse} from "../../util/ListResponse";
 
 const columnsDefinition: MUIDataTableColumn[] = [
     {
@@ -29,14 +31,22 @@ const columnsDefinition: MUIDataTableColumn[] = [
     }
 ]
 
-type Props = {
-
-};
-const Table = (props: Props) => {
-    const [data, setData] = useState([])
+const Table = () => {
+    const [data, setData] = useState<Genre[]>([])
 
     useEffect(() => {
-        genreHttp.list().then(({data}) => setData(data.data))
+        let isSubscribed = true;
+
+        (async () => {
+            const {data} = await genreHttp.list<ListResponse<Genre>>()
+            if (isSubscribed) {
+                setData(data.data)
+            }
+        })()
+
+        return () => {
+            isSubscribed = false
+        }
     }, [])
     return (
         <MUIDataTable

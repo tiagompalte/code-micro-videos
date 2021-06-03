@@ -1,7 +1,7 @@
 export interface BaseModel {
-    id: string,
+    readonly id: string,
     is_active: boolean,
-    created_at: Date,
-    updated_at: Date,
-    deleted_at: Date
+    readonly created_at: string,
+    readonly updated_at: string,
+    readonly deleted_at: string | null
 }

@@ -49,7 +49,8 @@ export const Form = () => {
     }
 
     useEffect(() => {
-        const loadData = async () => {
+        let isSubscribed = true;
+        (async () => {
             setLoading(true)
             const promises = [categoryHttp.list()]
             if (id) {
@@ -58,22 +59,26 @@ export const Form = () => {
 
             try {
                 const [categoriesResponse, genreResponse] = await Promise.all(promises)
-                setCategories(categoriesResponse.data.data)
-                if (id) {
-                    setGenre(genreResponse.data.data)
-                    reset({
-                        ...genreResponse.data.data,
-                        categories_id: genreResponse.data.data.categories.map(category => category.id)
-                    })
+                if (isSubscribed) {
+                    setCategories(categoriesResponse.data.data)
+                    if (id) {
+                        setGenre(genreResponse.data.data)
+                        reset({
+                            ...genreResponse.data.data,
+                            categories_id: genreResponse.data.data.categories.map(category => category.id)
+                        })
+                    }
                 }
             } catch (e) {
                 snackbar.enqueueSnackbar('Não foi possível carregar as informações', {variant: "error"})
             } finally {
                 setLoading(false)
             }
-        }
+        })()
 
-        loadData()
+        return () => {
+            isSubscribed = false
+        }
     }, [])
 
     useEffect(() => {

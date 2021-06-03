@@ -59,20 +59,25 @@ export const Form = () => {
             return
         }
 
-        const getCastMember = async () => {
+        let isSubscribed = true;
+        (async () => {
             setLoading(false)
             try {
                 const {data} = await castMemberHttp.get(id)
-                setCastMember(data.data)
-                reset(data.data)
+                if (isSubscribed) {
+                    setCastMember(data.data)
+                    reset(data.data)
+                }
             } catch (e) {
                 snackbar.enqueueSnackbar('Não foi possível carregar as informações', {variant: "error"})
             } finally {
                 setLoading(false)
             }
-        }
+        })()
 
-        getCastMember()
+        return () => {
+            isSubscribed = false
+        }
     })
 
     useEffect(() => {
