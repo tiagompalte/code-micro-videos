@@ -5,6 +5,7 @@ import format from 'date-fns/format';
 import genreHttp from "../../util/http/genre-http";
 import {Genre} from "../../models/Genre";
 import {ListResponse} from "../../util/ListResponse";
+import DefaultTable from "../../components/Table";
 
 const columnsDefinition: MUIDataTableColumn[] = [
     {
@@ -49,7 +50,7 @@ const Table = () => {
         }
     }, [])
     return (
-        <MUIDataTable
+        <DefaultTable
             title="Listagem de gêneros"
             columns={columnsDefinition}
             data={data}
